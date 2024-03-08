@@ -1,102 +1,121 @@
 #include <stdbool.h>
 #include <stdio.h>
 
-void swap(int* xp, int* yp)
-{
+void swap(int *xp, int *yp) {
     int temp = *xp;
     *xp = *yp;
     *yp = temp;
 }
 
-// An optimized version of Bubble Sort
-void bubbleSort(int arr[], int n)
-{
-    int i, j;
-    bool swapped;
+void bubbleSort(int array[], int size) {
     int swapCount = 0;
+    int swappedCountArray[size][2]; // Adjust the size dynamically based on the input array
 
-    for (i = 0; i < n - 1; i++) {
-        swapped = false;
-        for (j = 0; j < n - i - 1; j++) {
-            if (arr[j] > arr[j + 1]) {
-                swap(&arr[j], &arr[j + 1]);
-                swapped = true;
+    // Initialize the swappedCountArray
+    for (int i = 0; i < size; i++) {
+        swappedCountArray[i][0] = array[i];
+        swappedCountArray[i][1] = 0;
+    }
+
+    // Sorting process for the main array and count swaps
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - i - 1; j++) {
+            if (array[j] > array[j + 1]) {
+                swap(&array[j], &array[j + 1]);
                 swapCount++;
+
+                // Update the swap count for involved elements
+                for (int k = 0; k < size; k++) {
+                    if (array[j] == swappedCountArray[k][0] || array[j + 1] == swappedCountArray[k][0]) {
+                        swappedCountArray[k][1]++;
+                    }
+                }
+            }
+        }
+    }
+
+    // Sorting swappedCountArray based on the elements
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - i - 1; j++) {
+            if (swappedCountArray[j][0] > swappedCountArray[j + 1][0]) {
+                swap(&swappedCountArray[j][0], &swappedCountArray[j + 1][0]);
+                swap(&swappedCountArray[j][1], &swappedCountArray[j + 1][1]);
+            }
+        }
+    }
+
+    // Printing the result
+    for (int i = 0; i < size; i++) {
+        printf("%d Number of swaps: %d\n", swappedCountArray[i][0], swappedCountArray[i][1]);
+    }
+    printf("Total Swaps: %d\n", swapCount);
+}
+
+void selectionSort(int arr[], int n) {
+    int swaps = 0;
+    int swapCount[n]; // Array to count swaps for each element
+
+    // Initialize swap count array
+    for (int i = 0; i < n; i++) {
+        swapCount[i] = 0;
+    }
+
+    for (int i = 0; i < n - 1; i++) {
+        int minIdx = i;
+        for (int j = i + 1; j < n; j++) {
+            if (arr[j] < arr[minIdx]) {
+                minIdx = j;
             }
         }
 
-        // If no two elements were swapped by inner loop,
-        // then break
-        if (swapped == false)
-            break;
-    }
-
-    // Print swap counts for each element
-    for (i = 0; i < n; i++) {
-        printf("%d: Swapped: %d times\n", arr[i], i + 1);
-    }
-
-    printf("Total # of swaps: %d\n", swapCount);
-}
-
-// Selection Sort function
-void selectionSort(int arr[], int n) 
-{ 
-    int i, j, min_idx; 
-    int swapCount = 0;
-
-    // One by one move boundary of unsorted subarray 
-    for (i = 0; i < n-1; i++) 
-    { 
-        // Find the minimum element in unsorted array 
-        min_idx = i; 
-        for (j = i+1; j < n; j++) 
-          if (arr[j] < arr[min_idx]) 
-            min_idx = j; 
-  
-        // Swap the found minimum element with the first element 
-        if (min_idx != i) {
-            swap(&arr[min_idx], &arr[i]);
-            swapCount++;
+        if (minIdx != i) {
+            swap(&arr[minIdx], &arr[i]);
+            swaps++;
+            swapCount[minIdx]++; // Increment swap count for minIdx element
+            swapCount[i]++; // Increment swap count for i element
         }
-    } 
-
-    // Print swap counts for each element
-    for (i = 0; i < n; i++) {
-        printf("%d: Swapped: %d times\n", arr[i], i + 1);
     }
 
-    printf("Total # of swaps: %d\n", swapCount);
-} 
-
-// Function to print an array
-void printArray(int arr[], int size)
-{
-    int i;
-    for (i = 0; i < size; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
+    // Printing the array elements and their swap counts
+    for (int i = 0; i < n; i++) {
+        printf("%d Number of Swaps: %d\n", arr[i], swapCount[i]);
+    }
+    printf("Total Swaps: %d\n", swaps); // Total number of swaps
 }
 
-int main()
-{
-    int arr1[] = { 97, 16, 45, 63, 13, 22, 7, 58, 72 };
+void resetArray(int arr[], int original[], int n) {
+    for (int i = 0; i < n; i++) {
+        arr[i] = original[i];
+    }
+}
+
+int main() {
+    int arr1[] = {97, 16, 45, 63, 13, 22, 7, 58, 72};
     int n1 = sizeof(arr1) / sizeof(arr1[0]);
 
-    int arr2[] = { 90, 80, 70, 60, 50, 40, 30, 20, 10 };
+    int arr2[] = {90, 80, 70, 60, 50, 40, 30, 20, 10};
     int n2 = sizeof(arr2) / sizeof(arr2[0]);
+    
+    int original_arr1[] = { 97, 16, 45, 63, 13, 22, 7, 58, 72 };
+    int original_arr2[] = { 90, 80, 70, 60, 50, 40, 30, 20, 10 };
 
-    printf("array1:\n");
-    printArray(arr1, n1);
-
-    printf("Bubble Sort:\n");
+    printf("array1 bubble sort:\n");
     bubbleSort(arr1, n1);
+    printf("\n");
 
-    printf("\narray2:\n");
-    printArray(arr2, n2);
+    printf("array2 bubble sort:\n");
+    bubbleSort(arr2, n2);
+    printf("\n");
 
-    printf("Selection Sort:\n");
+    printf("array1 selection sort:\n");
+    resetArray(arr1, original_arr1, n1);
+    selectionSort(arr1, n1);
+    printf("\n");
+
+    printf("array2 selection sort:\n");
+    resetArray(arr2, original_arr2, n2);
     selectionSort(arr2, n2);
+    printf("\n");
 
     return 0;
 }
